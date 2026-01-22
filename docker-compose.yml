@@ -1,0 +1,58 @@
+# create config file for docker-compose for postgreSQL and pgAdmin
+services:
+  db:
+    container_name: postgres_container
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres@2026
+      POSTGRES_DB: db_teste
+    ports:
+      - "5432:5432"  # [Host Port]:[Container Port]
+    volumes:
+      - postgres_container_data:/var/lib/postgresql 
+    # OBSERVAÇÃO:
+    # A partir do PostgreSQL 18+, o volume padrão passou a ser:
+    #   /var/lib/postgresql
+    #
+    # Nas versões <= 17, o diretório padrão de dados é:
+    #   /var/lib/postgresql/data
+  
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"   # [Host Port]:[Container Port]  -> http://localhost:5050 to access pgAdmin
+    volumes:
+      - pgadmin4_container_data:/var/lib/pgadmin  
+
+
+volumes:
+  postgres_container_data:
+  pgadmin4_container_data:
+
+# OBSERVAÇÕES:
+# Para subir os containers, use o comando: docker-compose up -d 
+# Para parar os containers, use o comando: docker-compose down
+# Para ver os logs dos containers, use o comando: docker-compose logs -f
+# para verificar os containers em execução, use o comando: docker-compose ps -a 
+# Para acessar o pgAdmin, abra o navegador e vá para: http://localhost:5050
+      #  Use as credenciais: admin@admin.com / root
+# Para conectar ao banco PostgreSQL via pgAdmin, use:
+      #  Hostname/address: IP do container PostgreSQL ou 'localhost' se estiver na mesma máquina
+      #  Port: 5432
+      #  Maintenance database: db_teste
+      #  Username: postgres
+      #  Password: postgres@2026
+
+# Para saber o IP do container PostgreSQL, use o comando:
+      #  docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' postgres_container
+      # ou so docker inspect postgres_container e procure pelo campo "IPAddress"
+
+# DICA MASTER: Se deu erro, pesquise no Google o erro específico, geralmente há soluções prontas para a maioria dos problemas comuns.
+
